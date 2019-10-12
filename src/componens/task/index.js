@@ -3,15 +3,17 @@ import './styles.css'
 
 class Task extends React.Component {
     render() {
+        const { id, complete, onChange, deleteTask, title } = this.props 
         return (
         <div className='btnWrapp'>
-            <p>{this.props.title}</p>
+            <p>{title}</p>
             <button 
-                onClick={ () => this.props.onChange(this.props.id)}
-                className={`btn ${this.props.complete ? 'complete' : 'notComplete'}`}
+                onClick={ () => onChange(id) }
+                className={`btn ${complete ? 'complete' : 'notComplete'}`}
             >
-                {this.props.complete ? 'Complete' : 'Not complete'}
+                {complete ? 'Complete' : 'Not complete'}
             </button>
+            <div className='delete' onClick={() => deleteTask(id)}></div>
         </div>
         )
     }

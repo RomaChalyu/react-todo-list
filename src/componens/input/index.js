@@ -1,14 +1,12 @@
 import React from 'react'
 import './styles.css'
 
-class Input extends React.Component {
-      input(event) {
-        return this.props.onChange(event.target.value)
-      }
-    
+class Input extends React.Component {  
     render() {
         return (
-        <input onChange ={(event) => this.input(event)} className='input'/>
+        <input onChange ={ (event) => this.props.onChange(event.target.value)} 
+         value= { this.props.inputValue } 
+        className='input'/>
         )
     }
 }

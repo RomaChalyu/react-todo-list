@@ -11,9 +11,9 @@ class Home extends React.Component {
             {id: 2, title: 'do dish', complete: true},
             {id: 3, title: 'learn react', complete: false},   
         ],
-        newTask : {title: null},
-        InputShowMessage: 'hidden',
-        InputTextMessage : '',
+        newTask: {title: ''},
+        InputTextMessage: '',
+        inputValue: '',
     }
 
     toggleTask = (id) => {
@@ -32,34 +32,42 @@ class Home extends React.Component {
         )
     }
     addTask = () => {
-        const arrTask = this.state.tasks  ;  
-        let newStr = this.state.newTask.title.split(' ').join('');
-        const lastItem = this.state.tasks[this.state.tasks.length -1].title;
-        if(newStr && newStr !== lastItem){
-            arrTask.push(this.state.newTask)
+        const { tasks, newTask } = this.state;
+        const newTasks = [...tasks];
+        const newStr = newTask.title.split(' ').filter(item => !!item).join(' ');
+        let lastItem;
+        tasks.length > 0 ? lastItem = tasks[tasks.length -1].title : lastItem = '';
+        if(newStr && newStr !== lastItem && newStr.length < 26){
+            newTask.title = newStr
+            newTasks.push(newTask)
+            this.onChangeInput()
             this.setState(
                 {
-                    InputShowMessage : 'hidden',
-                    tasks: arrTask
+                    tasks: newTasks,
                 }
             )
         }
         else if(newStr === lastItem){
-            (() => {
                 this.setState({
-                    InputShowMessage: 'unhidden',
                     InputTextMessage: 'Task with the same name already exists!'
                 })
-            })();
+        }
+        else if (newStr.length >= 26){
+            this.setState({ 
+                InputTextMessage : 'Task name is too long!'
+            })
         }
         else{
-            (() => {
-                this.setState({ 
-                    InputShowMessage: 'unhidden',
-                    InputTextMessage : 'Cannot create an empty task!'
-                })
-            })();
+            this.setState({ 
+                InputTextMessage : 'Cannot create an empty task!'
+            })
         }
+    }
+
+    onChangeInput = (str) => {
+        this.setState({
+            inputValue: ''
+        })
     }
 
     onChange = (str) => {
@@ -67,23 +75,35 @@ class Home extends React.Component {
         const task = {id: leng, title: str, complete: false}
         this.setState(
             {
-                newTask: task
+                newTask: task,
+                inputValue: str
+                
             }
         )
     }
 
+    deleteTask = (taskId) =>{
+        const { tasks } = this.state;
+        
+        const newTasks = tasks.filter((task) => task.id !== taskId )
+        this.setState({
+            tasks: newTasks,
+        })
+    }
+
     render(){
+        const { tasks, InputTextMessage, inputValue } = this.state  // { tasks: [], newTask:{}}
         return (
             <div className='wrapp'>
                 <div className='wrapper'>
                     <h1 className='title'>Todo list</h1>
                     <div className='input-container'>
-                        <Input onChange={this.onChange}/>
+                        <Input onChange={this.onChange} inputValue={inputValue} onChangeInput={this.onChangeInput} />
                             <button className="btnAdd" onClick={()=>{this.addTask()} }>add</button>
-                            <p className={this.state.InputShowMessage}>{this.state.InputTextMessage}</p>
+                            <p className={InputTextMessage ? 'unhidden' : 'hidden'}>{InputTextMessage}</p>
                     </div>
                 {
-                    this.state.tasks.map((task) => {
+                    tasks.map((task) => {
                         return (
                             <Task 
                                 title={task.title} 
@@ -91,6 +111,7 @@ class Home extends React.Component {
                                 key={task.id} 
                                 id={task.id} 
                                 onChange={this.toggleTask}
+                                deleteTask={this.deleteTask}
                             />
                             )
                         })  
